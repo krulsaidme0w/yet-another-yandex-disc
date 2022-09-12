@@ -66,6 +66,23 @@ namespace Endpoints {
                 return;
             }
 
+            for(auto i : items) {
+                if(i.type == "FILE") {
+                    try {
+                        repo.get()->InsertFile(i, updateDate);
+                    }
+                    catch (std::exception const &e) {
+                        if(e.what() == "NO PARENT") {
+                            response.send(Http::Code::Bad_Request, e.what());
+                        }
+                        else {
+                            response.send(Http::Code::Internal_Server_Error, e.what());
+                        }
+                    }
+                    continue;
+                }
+            }
+
             response.send(Http::Code::Ok, "OK");
         }
 

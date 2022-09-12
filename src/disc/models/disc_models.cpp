@@ -17,23 +17,23 @@ namespace Models {
             if(js.contains("type")) {
                 this->type = js["type"].get<std::string>();
             } else {
-                throw "Bad JSON";
+                throw std::runtime_error("BAD JSON");
             }
 
             if(this->type != "FILE" && this->type != "FOLDER") {
-                throw "Bad Type";
+                throw std::runtime_error("BAD JSON");
             }
         
             if(js.contains("id")) {
                 this->id = js["id"].get<std::string>();
             } else {
-                throw "Bad JSON";
+                throw std::runtime_error("BAD JSON");
             }
 
             if(js.contains("parentId")) {
                 this->parentId = js["parentId"].get<std::string>();
             } else {
-                throw "Bad JSON";
+                throw std::runtime_error("BAD JSON");
             }
 
             if (this->type == "FOLDER") {
@@ -46,17 +46,17 @@ namespace Models {
             if(js.contains("size")) {
                 this->size = js["size"];
             } else {
-                throw "Bad JSON";
+                throw std::runtime_error("BAD JSON");
             }
 
             if(this->url.size() > 255) {
-                throw "Bad JSON";
+                throw std::runtime_error("BAD JSON");
             }
 
             if(js.contains("url")) {
                 this->url = js["url"].get<std::string>();
             } else {
-                throw "Bad JSON";
+                throw std::runtime_error("BAD JSON");
             }
         };
 
@@ -75,8 +75,8 @@ namespace Models {
                 auto item = Item(it.value());
                 items.push_back(item);
             }
-            catch( ... ) {
-                throw "Bad Request";
+            catch (...) {
+                throw std::runtime_error("BAD JSON");
             }
         }
 
