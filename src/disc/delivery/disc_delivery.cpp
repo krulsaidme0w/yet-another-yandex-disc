@@ -77,9 +77,11 @@ namespace Endpoints {
                     catch (std::exception const &e) {
                         if(e.what() == "NO PARENT") {
                             response.send(Http::Code::Bad_Request, "Validation Failed");
+                            return;
                         }
                         else {
                             response.send(Http::Code::Internal_Server_Error, e.what());
+                            return;
                         }
                     }
                     continue;
@@ -92,9 +94,11 @@ namespace Endpoints {
                 catch (std::exception const &e) {
                     if(e.what() == "NO PARENT") {
                         response.send(Http::Code::Bad_Request, "Validation Failed");
+                        return;
                     }
                     else {
                         response.send(Http::Code::Internal_Server_Error, e.what());
+                        return;
                     }
                 }                
             }
@@ -103,13 +107,46 @@ namespace Endpoints {
         }
 
         void deleteFileByID(const Rest::Request& request, Http::ResponseWriter response) {
-            auto id = request.param(":id").as<std::string>();
+            std::string id = "";
+            std::string date = "";
+
+            try {
+                id = request.param(":id").as<std::string>();
+                date = request.query().get("date").value();
+            }
+            catch (std::exception const &e) {
+                response.send(Http::Code::Bad_Request, "Validation Failed");
+                return;
+            }
+
+            try {
+                updateDates(id, date);
+                deleteItem(id);
+            }
+            catch (std::exception const &e) {
+                if(e.what() == "NO PARENT") {
+                    response.send(Http::Code::Bad_Request, "Item not found");
+                    return;
+                }
+                else {
+                    response.send(Http::Code::Not_Found, "Item not found");
+                    return;
+                }
+            }
 
             response.send(Http::Code::Ok, "OK");
         }
 
         void getNodeByID(const Rest::Request& request, Http::ResponseWriter response) {
-            auto id = request.param(":id").as<std::string>();
+            std::string id = "";
+
+            try {
+                id = request.param(":id").as<std::string>();
+            }
+            catch (std::exception const &e) {
+                response.send(Http::Code::Bad_Request, "Validation Failed");
+                return;
+            }
 
             try {
                 auto i = repo.get()->GetItemById(id);
@@ -128,10 +165,12 @@ namespace Endpoints {
                 }
                 else {
                     response.send(Http::Code::Not_Found, "Item not found");
+                    return;
                 }
             }
             catch (std::exception const &e) {
                 response.send(Http::Code::Internal_Server_Error, e.what());
+                return;
             }
         }
 
@@ -153,6 +192,19 @@ namespace Endpoints {
                 auto parentId = repo.get()->GetParent(id);
                 if(parentId != "null") {
                     updateDates(parentId, date);
+                }
+            }
+            catch (std::exception const &e) {
+                throw std::runtime_error(e.what());
+            }
+        }
+        
+        void deleteItem(std::string id) {
+            try {
+                repo.get()->DeleteById(id);
+                auto children = repo.get()->GetChildren(id);
+                for(auto c : children) {
+                    deleteItem(c->item.id);
                 }
             }
             catch (std::exception const &e) {

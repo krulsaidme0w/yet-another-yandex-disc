@@ -252,6 +252,18 @@ namespace Repository {
             }
         }
 
+        void DeleteById(std::string id) {
+            std::string query = "DELETE FROM storage WHERE id = '" + pqxx::to_string(id) + "';";
+            pqxx::work txn{this->c};
+            try {
+                pqxx::result R{txn.exec(query)};
+                txn.commit();
+            }
+            catch (std::exception const &e) {
+                throw std::runtime_error(std::string("CANNOT DELETE ELEMENT: ") + std::string(e.what()) + "\n" + query);
+            }
+        }
+
     private:
         pqxx::connection c;
     };

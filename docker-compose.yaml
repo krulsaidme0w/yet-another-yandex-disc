@@ -20,16 +20,16 @@ services:
     networks:
       - main
 
-  # disc:
-  #   build:
-  #     context: ./
-  #     dockerfile: Dockerfile
-  #   depends_on:
-  #     - postgres
-  #   links:
-  #     - postgres
-  #   ports:
-  #     - "80:9080"
-  #   restart: unless-stopped
-  #   networks:
-  #     - main
+  disc:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    ports:
+      - "80:9080"
+    restart: unless-stopped
+    networks:
+      - main
