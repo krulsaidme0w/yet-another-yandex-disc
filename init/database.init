@@ -7,5 +7,9 @@ CREATE TABLE storage
   parentId VARCHAR(255) NOT NULL,
   size INTEGER,
   type STORAGE_TYPE,
-  updateDate DATE NOT NULL
+  updateDate VARCHAR(100) NOT NULL
 );
+
+CREATE INDEX ON storage(id, created_at);
+CREATE INDEX ON storage(id) WHERE parentId = 'null';
+CREATE INDEX ON storage(parentId);
