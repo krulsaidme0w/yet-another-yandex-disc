@@ -222,8 +222,26 @@ namespace Repository {
             }
         }
 
+        std::string GetParent(std::string id) {
+            std::string query = "SELECT parentId FROM storage WHERE id = '" + pqxx::to_string(id) + "';";
+
+            pqxx::work txn{this->c};
+            try {
+                pqxx::result R{txn.exec(query)};
+                txn.commit();
+                
+                for(auto row : R) {
+                    id = row[0].as<std::string>();
+                    return id;    
+                }
+            }
+            catch (std::exception const &e) {
+                throw std::runtime_error(std::string(e.what()));
+            }
+        }
+
         void UpdateDate(std::string id, std::string date) {
-            std::string queryUpdateParent = "UPDATE storage SET updateDate = '" + pqxx::to_string(date) + "' WHERE parentId = '" + pqxx::to_string(id) + "';";
+            std::string queryUpdateParent = "UPDATE storage SET updateDate = '" + pqxx::to_string(date) + "' WHERE id = '" + pqxx::to_string(id) + "';";
             pqxx::work txn{this->c};
             try {
                 pqxx::result R{txn.exec(queryUpdateParent)};

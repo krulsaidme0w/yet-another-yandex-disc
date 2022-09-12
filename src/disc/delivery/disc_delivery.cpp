@@ -150,10 +150,9 @@ namespace Endpoints {
         void updateDates(std::string id, std::string date) {
             try {
                 repo.get()->UpdateDate(id, date);
-                auto children = repo.get()->GetChildren(id);
-                for(auto c : children) {
-                    std::cout << c->item.id << std::endl;
-                    updateDates(c->item.id, date);
+                auto parentId = repo.get()->GetParent(id);
+                if(parentId != "null") {
+                    updateDates(parentId, date);
                 }
             }
             catch (std::exception const &e) {
