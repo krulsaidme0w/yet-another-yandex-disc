@@ -1,0 +1,35 @@
+version: "3.9"
+
+networks:
+  main:
+
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: "disc"
+      POSTGRES_USER: "user"
+      POSTGRES_HOST: "localhost"
+      POSTGRES_PASSWORD: "password"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ./init/database.init:/docker-entrypoint-initdb.d/create_tables.sql
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - main
+
+  # disc:
+  #   build:
+  #     context: ./
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     - postgres
+  #   links:
+  #     - postgres
+  #   ports:
+  #     - "80:9080"
+  #   restart: unless-stopped
+  #   networks:
+  #     - main

@@ -1,40 +1,83 @@
+#pragma once
+
 #include "cstdint"
 #include "vector"
 #include "iostream"
 
-#include "nlohmann/json.hpp"
+#include <cstddef>
+#include <nlohmann/json.hpp>
+#include <string>
 
 using json = nlohmann::json;
 
 namespace Models {
-    enum ItemType {
-        file = 0,
-        folder = 1,
-    };
-    
     struct Item {
     public:
         Item(json js) {
-            std::cout << js["id"] << std::endl;
-            std::cout << js["url"] << std::endl;
-            std::cout << js["parentId"] << std::endl;
-            std::cout << js["size"] << std::endl;
-            std::cout << js["type"] << std::endl;
+            if(js.contains("type")) {
+                this->type = js["type"].get<std::string>();
+            } else {
+                throw "Bad JSON";
+            }
+
+            if(this->type != "FILE" && this->type != "FOLDER") {
+                throw "Bad Type";
+            }
+        
+            if(js.contains("id")) {
+                this->id = js["id"].get<std::string>();
+            } else {
+                throw "Bad JSON";
+            }
+
+            if(js.contains("parentId")) {
+                this->parentId = js["parentId"].get<std::string>();
+            } else {
+                throw "Bad JSON";
+            }
+
+            if (this->type == "FOLDER") {
+                this->url = nullptr;
+                this->size = 0;
+
+                return;
+            }
+
+            if(js.contains("size")) {
+                this->size = js["size"];
+            } else {
+                throw "Bad JSON";
+            }
+
+            if(this->url.size() > 255) {
+                throw "Bad JSON";
+            }
+
+            if(js.contains("url")) {
+                this->url = js["url"].get<std::string>();
+            } else {
+                throw "Bad JSON";
+            }
         };
 
         std::string id;
         std::string url;
         std::string parentId;
         uint64_t size;
-        ItemType type;
+        std::string type;
     };
 
     std::vector<Item> ParseItems(json js) {
         std::vector<Item> items;
 
         for (json::iterator it = js.begin(); it != js.end(); ++it) {
-            auto item = Item(it.value());
-            items.push_back(item);
+            try {
+                auto item = Item(it.value());
+                items.push_back(item);
+            }
+            catch( ... ) {
+                throw "Bad Request";
+            }
         }
 
         return items;

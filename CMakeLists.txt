@@ -7,6 +7,6 @@ set(CMAKE_CXX_FLAGS         "-Wno-unused -Wno-deprecated -Wno-comment -Wno-reord
 set(CMAKE_CXX_FLAGS_DEBUG   "-O0 -g")
 find_package(Threads REQUIRED)
 
-add_subdirectory(src)
 add_subdirectory(vendor)
+add_subdirectory(src)
 add_subdirectory(cmd)

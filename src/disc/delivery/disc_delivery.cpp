@@ -1,18 +1,23 @@
 #include "iostream"
+#include <memory>
 
 #include <pistache/endpoint.h>
 #include <pistache/http.h>
 #include <pistache/router.h>
 
 #include "disc_models.cpp"
+#include "disc_repo.cpp"
 
 using namespace Pistache;
 
 namespace Endpoints {
     class DiscEndpoints {
     public:
-        explicit DiscEndpoints(Address addr)
-            : httpEndpoint(std::make_shared<Http::Endpoint>(addr)) {}
+        DiscEndpoints() = delete;
+        DiscEndpoints(Address addr, std::shared_ptr<Repository::DiscRepo> r) {
+            repo = r;
+            this->httpEndpoint = std::make_shared<Http::Endpoint>(addr);
+        }
 
         void Init(size_t thr = 4) {
             auto opts = Http::Endpoint::options()
@@ -36,25 +41,49 @@ namespace Endpoints {
         }
 
         void importFiles(const Rest::Request& request, Http::ResponseWriter response) {
-            json j = json::parse(request.body());
+            json j;
+            try {
+                j = json::parse(request.body());
+            }
+            catch (...) {
+                response.send(Http::Code::Bad_Request, "BAD JSON");
+                return;
+            }
+            
+            if(!j.contains("items") || !j.contains("updateDate")) {
+                response.send(Http::Code::Bad_Request, "NO ITEMS ARRAY OR NO UPDATE DATE FIELD");
+                return;
+            }
+
             const auto updateDate = j["updateDate"].get<std::string>();
-            std::cout << updateDate << '\n';
+            json jsItems = j["items"];
 
-            json items = j["items"];
-            std::vector<Models::Item> items = Models::ParseItems(items);
+            std::vector<Models::Item> items;
+            try {
+                items = Models::ParseItems(jsItems);
+            } catch (...) {
+                response.send(Http::Code::Bad_Request, "BAD ITEM JSON");
+                return;
+            }
 
-            response.send(Http::Code::Ok, "import files");
+            response.send(Http::Code::Ok, "OK");
         }
 
         void deleteFileByID(const Rest::Request& request, Http::ResponseWriter response) {
-            response.send(Http::Code::Ok, "delete files");
+            auto id = request.param(":id").as<std::string>();
+
+            response.send(Http::Code::Ok, "OK");
         }
 
         void getNodeByID(const Rest::Request& request, Http::ResponseWriter response) {
-            response.send(Http::Code::Ok, "get node");
+            auto id = request.param(":id").as<std::string>();
+
+            response.send(Http::Code::Ok, id);
         }
 
+        const char *options = "host=0.0.0.0 port=5432 user=user password=password dbname=disc";
         std::shared_ptr<Http::Endpoint> httpEndpoint;
         Rest::Router router;
+        std::shared_ptr<Repository::DiscRepo> repo;
     };
 }

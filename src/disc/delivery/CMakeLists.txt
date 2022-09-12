@@ -12,4 +12,5 @@ target_link_libraries(
         pistache
 
         disc_models
+        disc_repo
 )
