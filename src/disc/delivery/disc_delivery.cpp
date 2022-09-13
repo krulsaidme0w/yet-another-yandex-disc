@@ -212,7 +212,6 @@ namespace Endpoints {
             }
         }
 
-        const char *options = "host=0.0.0.0 port=5432 user=user password=password dbname=disc";
         std::shared_ptr<Http::Endpoint> httpEndpoint;
         Rest::Router router;
         std::shared_ptr<Repository::DiscRepo> repo;

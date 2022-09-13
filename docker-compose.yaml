@@ -11,9 +11,9 @@ services:
       POSTGRES_USER: "user"
       POSTGRES_HOST: "localhost"
       POSTGRES_PASSWORD: "password"
-      PGDATA: "/var/lib/postgresql/data/pgdata"
     volumes:
       - ./init/database.init:/docker-entrypoint-initdb.d/create_tables.sql
+      - /var/lib/postgresql/data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     restart: unless-stopped

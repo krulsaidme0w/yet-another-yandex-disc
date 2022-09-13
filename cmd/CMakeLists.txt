@@ -1,4 +1,4 @@
-find_package(libpqxx CONFIG REQUIRED)
+find_package(libpqxx REQUIRED)
 
 set(MAIN_SRCS main.cpp)
 

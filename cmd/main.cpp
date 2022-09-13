@@ -10,7 +10,7 @@
 
 int main() {
     try {
-        const char *options = "host=0.0.0.0 port=5432 user=user password=password dbname=disc";
+        const char *options = "host=postgres port=5432 user=user password=password dbname=disc";
         pqxx::connection c(options);
     }
     catch (std::exception const &e) {
@@ -18,7 +18,7 @@ int main() {
         return 1;
     }
 
-    const char *options = "host=0.0.0.0 port=5432 user=user password=password dbname=disc";
+    const char *options = "host=postgres port=5432 user=user password=password dbname=disc";
     auto repo = std::make_shared<Repository::DiscRepo>(Repository::DiscRepo(options));
 
     Port port(9080);

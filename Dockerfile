@@ -1,11 +1,9 @@
-FROM ubuntu:latest
+FROM fedora:36
 
-WORKDIR deps
-
-RUN apt-get update && apt-get install cmake build-essential git python3 -y
-RUN apt-get install nlohmann-json3-dev -y
-RUN apt-get install libpq-dev -y
-RUN apt-get install libpqxx-dev -y
+RUN dnf -y update
+RUN dnf -y install git
+RUN dnf -y install gcc-c++ cmake
+RUN dnf -y install json-devel libpq-devel libpqxx-devel
 
 WORKDIR app
 

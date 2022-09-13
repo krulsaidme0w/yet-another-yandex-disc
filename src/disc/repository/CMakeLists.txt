@@ -1,4 +1,4 @@
-find_package(libpqxx CONFIG REQUIRED)
+find_package(libpqxx REQUIRED)
 
 set(SRC disc_repo.cpp)
 set(LIBRARY_NAME disc_repo)
